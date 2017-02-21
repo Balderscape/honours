@@ -7,7 +7,8 @@ import matplotlib as mplt
 import matplotlib.pyplot as plt
 import prettyplotlib as ppl
 
-GMXRC = '/usr/local/gromacs_gpu/bin/GMXRC';
+#GMXRC = '/usr/local/gromacs_gpu/bin/GMXRC';
+GMXRC = '/home/ubuntu/gromacs-2016.2/bin/GMXRC';
 
 def subprocess_cmd(command, input=""):
     process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
