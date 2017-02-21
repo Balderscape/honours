@@ -1,12 +1,22 @@
-from IPython.core.display import Image
-
 import os
 import sys
+import subprocess
 
+from IPython.core.display import Image
 import matplotlib as mplt
 import matplotlib.pyplot as plt
 import prettyplotlib as ppl
 
+GMXRC = '/usr/local/gromacs_gpu/bin/GMXRC';
+
+def subprocess_cmd(command, input=""):
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+    proc_stdout = process.communicate(input)[0].strip()
+    print proc_stdout
+
+    
+def gmx(command, input=""):
+    subprocess_cmd(". %s; gmx %s" % (GMXRC, command), input);
 
 def plotXVG(ax, filename):
     infile=open(filename,'r')
@@ -44,12 +54,11 @@ def plotXVG(ax, filename):
            ppl.plot(ax,datax,datay[i],linewidth=2.0)
         
     
-def plotFigure(xvgfile):
+def plotFigure(infile):
     fig,ax = plt.subplots()
-    plotXVG(ax, xvgfile)
+    plotXVG(ax,infile)
     ppl.legend(ax)
-#     plt.legend()
-
+    
 
 
 def pymolPlotStructure(filename):
@@ -65,12 +74,44 @@ def pymolPlotStructure(filename):
     pymol.cmd.do("show cartoon")
     pymol.cmd.do("show spheres, name CL")
     pymol.cmd.do("color yellow, name CL")
-    pymol.cmd.do("dss")
-    pymol.cmd.do("ray 640,480")
+    pymol.cmd.do("ray 320,240")
     pymol.cmd.do("png temp.png")
     sleep(2)
     return Image(filename='temp.png')
 
+def pymolPlotGro(filename):
+    gmx("editconf -f %s -o temp.pdb" % filename)
+    return pymolPlotStructure("temp.pdb")
+
+def video(fname, mimetype):
+    """Load the video in the file `fname`, with given mimetype, and display as HTML5 video.
+    """
+    from IPython.display import HTML
+    video_encoded = open(fname, "rb").read().encode("base64")
+    video_tag = '<video controls alt="test" src="data:video/{0};base64,{1}">'.format(mimetype, video_encoded)
+    return HTML(data=video_tag)
+
+def pymolMakeMovie():
+    import __main__
+    __main__.pymol_argv = ['pymol','-qc'] # Pymol: quiet and no GUI
+    from time import sleep
+    import pymol
+    pymol.finish_launching()
+    pymol.cmd.reinitialize()
+    pymol.cmd.do("load protein.pdb")
+    pymol.cmd.do("bg_color white")
+    pymol.cmd.do("intra_fit protein and (name c,n,ca)")
+    pymol.cmd.do("orient")
+    pymol.cmd.do("show cartoon")
+    pymol.cmd.do("viewport 640,480")
+    pymol.cmd.do("set ray_trace_frames,1")
+    pymol.cmd.do("mpng frame_.png")
+    sleep(20)
+    os.system("mencoder \"mf://*.png\" -mf type=png:fps=18 -ovc lavc -o output.avi")
+    os.system("ffmpeg -i output.avi -acodec libvorbis output.ogg")
+    os.system("rm *.png")
+    return video("output.ogg","ogg")
+    
 def pymolFlexibilityPlot(filename):
     import __main__
     __main__.pymol_argv = ['pymol','-qc'] # Pymol: quiet and no GUI
@@ -87,12 +128,7 @@ def pymolFlexibilityPlot(filename):
     pymol.cmd.do("viewport 640,480")
     pymol.cmd.do("dss")
     pymol.cmd.do("set all_states=1")
-    pymol.cmd.do("ray 640,480")
+    pymol.cmd.do("ray 320,240")
     pymol.cmd.do("png temp.png")
     sleep(10)
     return Image(filename='temp.png')
-
-
-def pymolPlotGro(filename):
-    os.system(". /home/ubuntu/gromacs-2016.2/bin/GMXRC; gmx editconf -f %s -o temp.pdb" % filename)
-    return pymolPlotStructure("temp.pdb")
