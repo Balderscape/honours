@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import logging
 
 from IPython.core.display import Image
 import matplotlib as mplt
@@ -10,14 +11,18 @@ import prettyplotlib as ppl
 #GMXRC = '/usr/local/gromacs_gpu/bin/GMXRC';
 GMXRC = '/home/ubuntu/gromacs-2016.2/bin/GMXRC';
 
-def subprocess_cmd(command, input=""):
-    process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
-    proc_stdout = process.communicate(input)[0].strip()
-    print proc_stdout
+def subprocess_cmd(command, input="", verbose=False):
+    if (verbose):
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True)
+    else:
+        process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)        
+    
+    (stdout, stderr) = process.communicate(input)
+    print stdout.strip()
 
     
-def gmx(command, input=""):
-    subprocess_cmd(". %s; gmx %s" % (GMXRC, command), input);
+def gmx(command, input="", verbose=False):
+    subprocess_cmd(". %s; gmx %s" % (GMXRC, command), input, verbose);
 
 def plotXVG(ax, filename):
     infile=open(filename,'r')
@@ -60,14 +65,14 @@ def plotFigure(infile):
     plotXVG(ax,infile)
     ppl.legend(ax)
     
-
-
 def pymolPlotStructure(filename):
+    stdout = sys.stdout
     import __main__
     __main__.pymol_argv = ['pymol','-qc'] # Pymol: quiet and no GUI
     from time import sleep
     import pymol
     pymol.finish_launching()
+    sys.stdout = stdout
     pymol.cmd.reinitialize()
     pymol.cmd.do("load %s"%filename)
     pymol.cmd.do("bg_color white")
@@ -93,11 +98,13 @@ def video(fname, mimetype):
     return HTML(data=video_tag)
 
 def pymolMakeMovie():
+    stdout = sys.stdout
     import __main__
     __main__.pymol_argv = ['pymol','-qc'] # Pymol: quiet and no GUI
     from time import sleep
     import pymol
     pymol.finish_launching()
+    sys.stdout = stdout
     pymol.cmd.reinitialize()
     pymol.cmd.do("load protein.pdb")
     pymol.cmd.do("bg_color white")
@@ -114,11 +121,13 @@ def pymolMakeMovie():
     return video("output.ogg","ogg")
     
 def pymolFlexibilityPlot(filename):
+    stdout = sys.stdout
     import __main__
     __main__.pymol_argv = ['pymol','-qc'] # Pymol: quiet and no GUI
     from time import sleep
     import pymol
     pymol.finish_launching()
+    sys.stdout = stdout
     pymol.cmd.reinitialize()
     pymol.cmd.do("load %s"%filename)
     pymol.cmd.do("bg_color white")
