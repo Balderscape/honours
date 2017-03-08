@@ -9,6 +9,8 @@ RUN pip install --upgrade pip
 RUN pip install --upgrade setuptools
 RUN pip install markdown pelican jupyter ipython nbconvert beautifulsoup4 ghp-import matplotlib
 
-WORKDIR /site
+WORKDIR /honours
+
+EXPORT 8000
 
 
