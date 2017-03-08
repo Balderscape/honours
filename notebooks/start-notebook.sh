@@ -2,5 +2,9 @@
 
 set -e
 
-export PATH=$CONDA_DIR/bin:$PATH
+. /usr/share/modules/init/bash
+
+module load conda3
+module load gromacs
+
 jupyter notebook

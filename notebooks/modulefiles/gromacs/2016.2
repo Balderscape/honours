@@ -1,0 +1,35 @@
+#%Module1.0#####################################################################
+##
+## $name modulefile
+##
+
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+set loading [module-info mode load]
+set desc [join [read [ open "/usr/share/modules/modulefiles/$name/.desc" ] ] ]
+
+proc ModulesHelp { } {
+  puts stderr "\tThis module sets the envinronment for $name v$ver"
+}
+
+module-whatis   "$desc (v$ver)"
+
+##if { $loading && ![ is-loaded intel-mpi ] } {
+##	module load intel-mpi
+##}
+##if { $loading && ![ is-loaded gcc/4.9.3 ] } {
+##	module load gcc/4.9.3
+##}
+
+set GROMACSDIR /opt/$name/$ver
+
+setenv          GROMACSDIR      $GROMACSDIR
+prepend-path    PATH            $GROMACSDIR/bin
+prepend-path    GMXBIN          $GROMACSDIR/bin
+prepend-path    LD_LIBRARY_PATH $GROMACSDIR/lib64
+prepend-path    LD_LIBRARY_PATH $GROMACSDIR/lib
+prepend-path    GMXLDLIB        $GROMACSDIR/lib
+prepend-path    GMXMAN          $GROMACSDIR/share/man
+prepend-path    MANPATH         $GROMACSDIR/share/man
+prepend-path    GMXDATA         $GROMACSDIR/share/gromacs
+prepend-path    PKG_CONFIG_PATH $GROMACSDIR/lib/pkgconfig

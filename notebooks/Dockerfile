@@ -13,7 +13,27 @@ RUN apt-get update -yqq \
 		bzip2 \
 		ca-certificates \
 		sudo \
-		locales \
+        locales \
+        cmake \
+        gcc \
+        g++ \
+        environment-modules \
+        git \
+        vim \
+        jed \
+        emacs \
+        python-dev \
+        unzip \
+        libsm6 \
+        pandoc \
+        texlive-latex-base \
+        texlive-latex-extra \
+        texlive-fonts-extra \
+        texlive-fonts-recommended \
+        texlive-generic-recommended \
+        libxrender1 \
+        inkscape \
+        libav-tools \
 	&& apt-get clean \
 	&& rm -fr /var/lib/apt/lists
 
@@ -57,23 +77,7 @@ WORKDIR /root/notebooks
 # Configure container startup
 ENTRYPOINT ["tini", "--"]
 
-# Add local files as late as possible to avoid cache busting
-COPY start-notebook.sh /usr/local/bin/
-COPY jupyter_notebook_config.py /root/.jupyter/
-
-CMD ["start-notebook.sh"]
-
-
 # Install Gromacs
-RUN apt-get update -yqq \
-	&& apt-get install -yqq --no-install-recommends \
-		build-essential \
-		gcc \
-		g++ \
-		cmake \
-	&& apt-get clean \
-	&& rm -fr /var/lib/apt/lists
-
 ENV GROMACS_DIR /opt/gromacs/2016.2
 RUN cd /tmp && \
     mkdir -p $GROMACS_DIR && \
@@ -83,8 +87,30 @@ RUN cd /tmp && \
     cd gromacs-2016.2 && \
     mkdir build && \
     cd build && \
-    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON -DGMX_OPENMP=ON -DCMAKE_INSTALL_PREFIX=$GROMACS_DIR && \
+    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DGMX_OPENMP=ON -DCMAKE_INSTALL_PREFIX=$GROMACS_DIR && \
     make && \
     make install && \
     cd /tmp && \
     rm -fr gromacs-2016.2
+
+# Set up conda environments for the notebooks
+
+
+
+# Setup the module system
+RUN echo ". /usr/share/modules/init/bash" >> /root/.bashrc \
+    && mkdir -p /usr/share/modules/modulefiles/conda3 \
+    && mkdir -p /usr/share/modules/modulefiles/gromacs
+
+COPY modulefiles/conda3/* /usr/share/modules/modulefiles/conda3/
+COPY modulefiles/gromacs/* /usr/share/modules/modulefiles/gromacs/
+
+
+# Add local files as late as possible to avoid cache busting
+COPY start-notebook.sh /usr/local/bin/
+RUN chmod a+x /usr/local/bin/start-notebook.sh
+
+COPY jupyter_notebook_config.py /root/.jupyter/
+
+CMD ["start-notebook.sh"]
+

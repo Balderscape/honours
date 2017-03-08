@@ -1,0 +1,19 @@
+#%Module1.0#####################################################################
+##
+## $name modulefile
+##
+
+set ver [lrange [split [ module-info name ] / ] 1 1 ]
+set name [lrange [split [ module-info name ] / ] 0 0 ]
+set loading [module-info mode load]
+set desc [join [read [ open "/usr/share/modules/modulefiles/$name/.desc" ] ] ]
+
+proc ModulesHelp { } {
+  puts stderr "\tThis module sets the envinronment for $name v$ver"
+}
+
+module-whatis   "$desc (v$ver)"
+
+set CONDADIR /opt/$name/$ver
+
+prepend-path    PATH            $CONDADIR/bin
