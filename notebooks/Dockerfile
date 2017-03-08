@@ -35,7 +35,6 @@ RUN mkdir /root/.jupyter \
 
 # Install conda as root
 ENV CONDA_DIR /opt/conda3/4.2.12
-#ENV PATH $CONDA_DIR/bin:$PATH
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-4.2.12-Linux-x86_64.sh && \
@@ -52,8 +51,6 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes \
     nb_conda \
     && $CONDA_DIR/bin/conda clean -tipsy
 
-#USER root
-
 EXPOSE 8888
 WORKDIR /root/notebooks
 
@@ -65,3 +62,29 @@ COPY start-notebook.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /root/.jupyter/
 
 CMD ["start-notebook.sh"]
+
+
+# Install Gromacs
+RUN apt-get update -yqq \
+	&& apt-get install -yqq --no-install-recommends \
+		build-essential \
+		gcc \
+		g++ \
+		cmake \
+	&& apt-get clean \
+	&& rm -fr /var/lib/apt/lists
+
+ENV GROMACS_DIR /opt/gromacs/2016.2
+RUN cd /tmp && \
+    mkdir -p $GROMACS_DIR && \
+    wget --quiet http://ftp.gromacs.org/pub/gromacs/gromacs-2016.2.tar.gz && \
+    tar xzf gromacs-2016.2.tar.gz && \
+    rm gromacs-2016.2.tar.gz && \
+    cd gromacs-2016.2 && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON -DGMX_OPENMP=ON -DCMAKE_INSTALL_PREFIX=$GROMACS_DIR && \
+    make && \
+    make install && \
+    cd /tmp && \
+    rm -fr gromacs-2016.2
