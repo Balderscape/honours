@@ -120,11 +120,20 @@ RUN apt-get update -y \
 
 # Set up conda environments for the notebooks
 
-RUN $CONDA_DIR/bin/conda create --name md-gmx-2016.2 --yes python=2.7 \ 
-	&& $CONDA_DIR/bin/conda install -c mw -c salford_systems --name md-gmx-2016.2 matplotlib pymol prettyplotlib
+RUN $CONDA_DIR/bin/conda create --name md-gmx-2016.2 --yes python=2.7 ipykernel \ 
 	&& $CONDA_DIR/bin/conda clean -tipsy
 
+RUN $CONDA_DIR/bin/conda install --yes -c mw --name md-gmx-2016.2 pymol \
+    && $CONDA_DIR/bin/conda clean -tipsy
 
+RUN $CONDA_DIR/bin/conda install --yes -c salford_systems --name md-gmx-2016.2 matplotlib prettyplotlib \
+    && $CONDA_DIR/bin/conda clean -tipsy
+
+# Load gromacs module when in the md-gmx-2016.2 environment
+RUN mkdir -p /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/activate.d \
+    && mkdir -p /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/deactivate.d \
+    && echo "module load gromacs/2016.2" > /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/activate.d/gromacs.sh \
+    && echo "module unload gromacs/2016.2" > /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/deactivate.d/gromacs.sh    
 
 # Add local files as late as possible to avoid cache busting
 COPY start-notebook.sh /usr/local/bin/
