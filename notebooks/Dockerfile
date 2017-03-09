@@ -4,9 +4,9 @@
 
 FROM krallin/ubuntu-tini:xenial
 
-RUN apt-get update -yqq \
-	&& apt-get upgrade -yqq \
-	&& apt-get install -yqq --no-install-recommends \
+RUN apt-get update -y \
+	&& apt-get upgrade -y \
+	&& apt-get install -y --no-install-recommends \
 		build-essential \
 		git \
 		wget \
@@ -17,23 +17,7 @@ RUN apt-get update -yqq \
         cmake \
         gcc \
         g++ \
-        environment-modules \
-        git \
-        vim \
-        jed \
-        emacs \
-        python-dev \
-        unzip \
-        libsm6 \
-        pandoc \
-        texlive-latex-base \
-        texlive-latex-extra \
-        texlive-fonts-extra \
-        texlive-fonts-recommended \
-        texlive-generic-recommended \
-        libxrender1 \
-        inkscape \
-        libav-tools \
+        less \
 	&& apt-get clean \
 	&& rm -fr /var/lib/apt/lists
 
@@ -57,7 +41,7 @@ RUN mkdir /root/.jupyter \
 ENV CONDA_DIR /opt/conda3/4.2.12
 RUN cd /tmp && \
     mkdir -p $CONDA_DIR && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-4.2.12-Linux-x86_64.sh && \
+    wget https://repo.continuum.io/miniconda/Miniconda3-4.2.12-Linux-x86_64.sh && \
     echo "c59b3dd3cad550ac7596e0d599b91e75d88826db132e4146030ef471bb434e9a *Miniconda3-4.2.12-Linux-x86_64.sh" | sha256sum -c - && \
     /bin/bash Miniconda3-4.2.12-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
     rm Miniconda3-4.2.12-Linux-x86_64.sh && \
@@ -72,16 +56,17 @@ RUN $CONDA_DIR/bin/conda install --quiet --yes \
     && $CONDA_DIR/bin/conda clean -tipsy
 
 EXPOSE 8888
-WORKDIR /root/notebooks
+WORKDIR /root
 
 # Configure container startup
 ENTRYPOINT ["tini", "--"]
 
 # Install Gromacs
 ENV GROMACS_DIR /opt/gromacs/2016.2
+
 RUN cd /tmp && \
     mkdir -p $GROMACS_DIR && \
-    wget --quiet http://ftp.gromacs.org/pub/gromacs/gromacs-2016.2.tar.gz && \
+    wget http://ftp.gromacs.org/pub/gromacs/gromacs-2016.2.tar.gz && \
     tar xzf gromacs-2016.2.tar.gz && \
     rm gromacs-2016.2.tar.gz && \
     cd gromacs-2016.2 && \
@@ -93,17 +78,56 @@ RUN cd /tmp && \
     cd /tmp && \
     rm -fr gromacs-2016.2
 
-# Set up conda environments for the notebooks
+# Setup the environment module system
+RUN apt-get update -y \
+	&& apt-get install -y --no-install-recommends \
+        environment-modules \
+	&& apt-get clean \
+	&& rm -fr /var/lib/apt/lists
 
-
-
-# Setup the module system
 RUN echo ". /usr/share/modules/init/bash" >> /root/.bashrc \
     && mkdir -p /usr/share/modules/modulefiles/conda3 \
     && mkdir -p /usr/share/modules/modulefiles/gromacs
 
 COPY modulefiles/conda3/* /usr/share/modules/modulefiles/conda3/
 COPY modulefiles/gromacs/* /usr/share/modules/modulefiles/gromacs/
+
+
+
+# Add some more OS dependencies for the notebook server
+RUN apt-get update -y \
+	&& apt-get upgrade -y \
+	&& apt-get install -y --no-install-recommends \
+#        git \
+#        vim \
+#        jed \
+#        emacs \
+        python-dev \
+        unzip \
+        libsm6 \
+        pandoc \
+        texlive-latex-base \
+        texlive-latex-extra \
+        texlive-fonts-extra \
+        texlive-fonts-recommended \
+        texlive-generic-recommended \
+#        libxrender1 \
+#        inkscape \
+        libav-tools \
+	&& apt-get clean \
+	&& rm -fr /var/lib/apt/lists
+
+
+# Set up conda environments for the notebooks
+
+#RUN $CONDA_DIR/bin/conda create --name md-gmx-2016.2 --yes python=2.7 \
+#	-c psi4 -c salford_systems \
+#	'numpy' \
+#	'matplotlib=1.5*' \
+#	'prettyplotlib' \
+#	'pymol=1.7.5' \
+#	&& $CONDA_DIR/bin/conda clean -tipsy
+
 
 
 # Add local files as late as possible to avoid cache busting
@@ -113,4 +137,5 @@ RUN chmod a+x /usr/local/bin/start-notebook.sh
 COPY jupyter_notebook_config.py /root/.jupyter/
 
 CMD ["start-notebook.sh"]
+
 
