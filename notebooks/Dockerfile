@@ -120,13 +120,9 @@ RUN apt-get update -y \
 
 # Set up conda environments for the notebooks
 
-#RUN $CONDA_DIR/bin/conda create --name md-gmx-2016.2 --yes python=2.7 \
-#	-c psi4 -c salford_systems \
-#	'numpy' \
-#	'matplotlib=1.5*' \
-#	'prettyplotlib' \
-#	'pymol=1.7.5' \
-#	&& $CONDA_DIR/bin/conda clean -tipsy
+RUN $CONDA_DIR/bin/conda create --name md-gmx-2016.2 --yes python=2.7 \ 
+	&& $CONDA_DIR/bin/conda install -c mw -c salford_systems --name md-gmx-2016.2 matplotlib pymol prettyplotlib
+	&& $CONDA_DIR/bin/conda clean -tipsy
 
 
 
