@@ -135,6 +135,19 @@ RUN mkdir -p /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/activate.d \
     && echo "module load gromacs/2016.2" > /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/activate.d/gromacs.sh \
     && echo "module unload gromacs/2016.2" > /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/deactivate.d/gromacs.sh    
 
+# Setup Remote Kernal to allow for notebooks to run on Artemis
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        libssl-dev \
+        openssh-client \
+    && apt-get clean \
+    && rm -fr /var/lib/apt/lists
+
+RUN $CONDA_DIR/bin/pip install rk
+# rk install-template
+# Setup /usr/local/share/jupyter/kernels/template/kernel.json
+# Setup ssh credentials for remote login
+
 # Add local files as late as possible to avoid cache busting
 COPY start-notebook.sh /usr/local/bin/
 RUN chmod a+x /usr/local/bin/start-notebook.sh
