@@ -1,0 +1,10 @@
+{
+ "argv": [
+  "rkscript",
+  "python",
+  "{connection_file}",
+  "psol3692@hpc.sydney.edu.au"
+ ],
+ "display_name": "HPC @ Artemis",
+ "language": "python"
+}

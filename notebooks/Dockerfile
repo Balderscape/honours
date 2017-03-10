@@ -130,29 +130,34 @@ RUN $CONDA_DIR/bin/conda install --yes -c salford_systems --name md-gmx-2016.2 m
     && $CONDA_DIR/bin/conda clean -tipsy
 
 # Load gromacs module when in the md-gmx-2016.2 environment
-RUN mkdir -p /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/activate.d \
-    && mkdir -p /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/deactivate.d \
-    && echo "module load gromacs/2016.2" > /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/activate.d/gromacs.sh \
-    && echo "module unload gromacs/2016.2" > /opt/conda3/4.2.12/envs/md-gmx-2016.2/etc/conda/deactivate.d/gromacs.sh    
+RUN mkdir -p $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/activate.d \
+    && mkdir -p $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/deactivate.d \
+    && echo "module load gromacs/2016.2" > $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/activate.d/gromacs.sh \
+    && echo "module unload gromacs/2016.2" > $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/deactivate.d/gromacs.sh    
 
 # Setup Remote Kernal to allow for notebooks to run on Artemis
 RUN apt-get update -y \
     && apt-get install -y --no-install-recommends \
         libssl-dev \
+        libffi-dev \
         openssh-client \
+        dos2unix \
     && apt-get clean \
     && rm -fr /var/lib/apt/lists
 
 RUN $CONDA_DIR/bin/pip install rk
-# rk install-template
-# Setup /usr/local/share/jupyter/kernels/template/kernel.json
-# Setup ssh credentials for remote login
+RUN ssh-keygen -t rsa -b 4096 -N "" -f /root/.ssh/id_rsa
+RUN $CONDA_DIR/bin/rk install-template
+
+#### NOTE: You will need to run: ssh-copy-id psol3692@hpc.sydney.edu.au once to copy the login keys to the hpc cluster ####
 
 # Add local files as late as possible to avoid cache busting
 COPY start-notebook.sh /usr/local/bin/
-RUN chmod a+x /usr/local/bin/start-notebook.sh
+RUN chmod a+x /usr/local/bin/start-notebook.sh && dos2unix /usr/local/bin/start-notebook.sh
+RUN echo "StrictHostKeyChecking no" > /root/.ssh/config
 
 COPY jupyter_notebook_config.py /root/.jupyter/
+COPY kernel.json /usr/local/share/jupyter/kernels/template/
 
 CMD ["start-notebook.sh"]
 
