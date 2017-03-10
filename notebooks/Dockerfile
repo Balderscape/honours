@@ -141,8 +141,35 @@ RUN $CONDA_DIR/bin/conda install --yes -c psi4 --name md pymol \
 RUN $CONDA_DIR/bin/pip install rk
 RUN $CONDA_DIR/bin/rk install-template
 
-
 #### NOTE: You will need to run: ssh-copy-id psol3692@hpc.sydney.edu.au once to copy the login keys to the hpc cluster ####
+
+# As Gromacs does not run on Mac, we need to rebuild with -DGMX_USE_RDTSCP=off for Macs...
+RUN cd /tmp && \
+    mkdir -p $GROMACS_DIR && \
+    wget http://ftp.gromacs.org/pub/gromacs/gromacs-2016.2.tar.gz && \
+    tar xzf gromacs-2016.2.tar.gz && \
+    rm gromacs-2016.2.tar.gz && \
+    cd gromacs-2016.2 && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=off -DGMX_OPENMP=ON -DCMAKE_INSTALL_PREFIX=$GROMACS_DIR && \
+    make && \
+    make install && \
+    cd /tmp && \
+    rm -fr gromacs-2016.2
+
+# Some fixups to get Conda env working correctly...
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+        libxrender1 \
+        libpng16-16 \
+        libglu1-mesa \
+    && apt-get clean \
+    && rm -fr /var/lib/apt/lists
+
+RUN $CONDA_DIR/bin/conda install --yes --name md numpy 'libpng=1.5' \
+    && $CONDA_DIR/bin/conda clean -tipsy
+
 
 # Add local files as late as possible to avoid cache busting
 COPY start-notebook.sh /usr/local/bin/
