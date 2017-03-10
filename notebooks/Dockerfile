@@ -92,8 +92,6 @@ RUN echo ". /usr/share/modules/init/bash" >> /root/.bashrc \
 COPY modulefiles/conda3/* /usr/share/modules/modulefiles/conda3/
 COPY modulefiles/gromacs/* /usr/share/modules/modulefiles/gromacs/
 
-
-
 # Add some more OS dependencies for the notebook server
 RUN apt-get update -y \
 	&& apt-get upgrade -y \
@@ -114,40 +112,36 @@ RUN apt-get update -y \
 #        libxrender1 \
 #        inkscape \
         libav-tools \
-	&& apt-get clean \
-	&& rm -fr /var/lib/apt/lists
-
-
-# Set up conda environments for the notebooks
-
-RUN $CONDA_DIR/bin/conda create --name md-gmx-2016.2 --yes python=2.7 ipykernel \ 
-	&& $CONDA_DIR/bin/conda clean -tipsy
-
-RUN $CONDA_DIR/bin/conda install --yes -c mw --name md-gmx-2016.2 pymol \
-    && $CONDA_DIR/bin/conda clean -tipsy
-
-RUN $CONDA_DIR/bin/conda install --yes -c salford_systems --name md-gmx-2016.2 matplotlib prettyplotlib \
-    && $CONDA_DIR/bin/conda clean -tipsy
-
-# Load gromacs module when in the md-gmx-2016.2 environment
-RUN mkdir -p $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/activate.d \
-    && mkdir -p $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/deactivate.d \
-    && echo "module load gromacs/2016.2" > $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/activate.d/gromacs.sh \
-    && echo "module unload gromacs/2016.2" > $CONDA_DIR/envs/md-gmx-2016.2/etc/conda/deactivate.d/gromacs.sh    
-
-# Setup Remote Kernal to allow for notebooks to run on Artemis
-RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends \
         libssl-dev \
         libffi-dev \
         openssh-client \
         dos2unix \
-    && apt-get clean \
-    && rm -fr /var/lib/apt/lists
+	&& apt-get clean \
+	&& rm -fr /var/lib/apt/lists
 
-RUN $CONDA_DIR/bin/pip install rk
 RUN ssh-keygen -t rsa -b 4096 -N "" -f /root/.ssh/id_rsa
+
+# Set up conda environments for the notebooks
+
+RUN $CONDA_DIR/bin/conda create --name md --yes python=2.7 ipykernel \ 
+	&& $CONDA_DIR/bin/conda clean -tipsy
+
+RUN $CONDA_DIR/bin/conda install --yes -c salford_systems --name md matplotlib prettyplotlib \
+    && $CONDA_DIR/bin/conda clean -tipsy
+
+RUN $CONDA_DIR/bin/conda install --yes -c psi4 --name md pymol \
+    && $CONDA_DIR/bin/conda clean -tipsy
+
+# Load gromacs module when in the md-gmx-2016.2 environment
+#RUN mkdir -p $CONDA_DIR/envs/md/etc/conda/activate.d \
+#    && mkdir -p $CONDA_DIR/envs/md/etc/conda/deactivate.d \
+#    && echo "module load gromacs/2016.2" > $CONDA_DIR/envs/md/etc/conda/activate.d/gromacs.sh \
+#    && echo "module unload gromacs/2016.2" > $CONDA_DIR/envs/md/etc/conda/deactivate.d/gromacs.sh    
+
+# Setup Remote Kernal to allow for notebooks to run on Artemis
+RUN $CONDA_DIR/bin/pip install rk
 RUN $CONDA_DIR/bin/rk install-template
+
 
 #### NOTE: You will need to run: ssh-copy-id psol3692@hpc.sydney.edu.au once to copy the login keys to the hpc cluster ####
 
