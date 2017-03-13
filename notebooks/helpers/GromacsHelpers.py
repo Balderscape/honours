@@ -7,6 +7,7 @@ from IPython.core.display import Image
 import matplotlib as mplt
 import matplotlib.pyplot as plt
 import prettyplotlib as ppl
+import numpy as np
 
 #GMXRC = '/usr/local/gromacs_gpu/bin/GMXRC';
 GMXRC = '/home/ubuntu/gromacs-2016.2/bin/GMXRC';
@@ -23,6 +24,9 @@ def subprocess_cmd(command, input="", verbose=False):
     
 def gmx(command, input="", verbose=False):
     subprocess_cmd(". %s; gmx %s" % (GMXRC, command), input, verbose);
+
+def runningMeanFast(x, N):
+    return np.convolve(x, np.ones((N,))/N)[(N-1):]
 
 def plotXVG(ax, filename):
     infile=open(filename,'r')
@@ -50,14 +54,17 @@ def plotXVG(ax, filename):
         
     infile.close()
     
+    avg = runningMeanFast(datay[0], 100)
     
     for i in range(0,len(datay)):
         if len(legends)==len(datay):
            ppl.plot(ax,datax,datay[i],linewidth=2.0,label=legends[i])
+           ppl.plot(ax,datax[0:-100],avg[0:-100],linewidth=2.0,label='Avg')
 #             ax.plot(datax,datay[i],linewidth=2.0,label=legends[i])
         else:
 #             ax.plot(datax,datay[i],linewidth=2.0)
            ppl.plot(ax,datax,datay[i],linewidth=2.0)
+           ppl.plot(ax,datax[0:-100],avg[0:-100],linewidth=2.0)
         
     
 def plotFigure(infile):
