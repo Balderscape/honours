@@ -1,0 +1,86 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{honours}
+
+\RequirePackage{xcolor}     %for annotations
+\RequirePackage{graphicx}   %for logo
+\RequirePackage{amsmath}
+\RequirePackage{amsthm}
+\RequirePackage{amssymb}
+\usepackage{filecontents}
+
+\newif\ifdraft
+
+\DeclareOption{draft}{\drafttrue}
+\DeclareOption*{\PackageWarning{examplepackage}{Unknown ‘\CurrentOption’}}
+\ProcessOptions\relax
+
+%subtitle
+\newcommand*{\subtitle}[1]{\gdef\@subtitle{#1}}
+\newcommand*{\@subtitle}{}%
+
+%logo
+\newcommand*{\logo}[1]{\gdef\@logo{#1}}
+\newcommand*{\@logo}{}%
+
+%degree
+\newcommand*{\degree}[1]{\gdef\@degree{#1}}
+\newcommand*{\@degree}{}%
+
+%university
+\newcommand*{\university}[1]{\gdef\@university{#1}}
+\newcommand*{\@university}{}%
+
+%school
+\newcommand*{\school}[1]{\gdef\@school{#1}}
+\newcommand*{\@school}{}%
+
+%submission month
+\newcommand*{\submit}[1]{\gdef\@submit{#1}}
+\newcommand*{\@submit}{}%
+
+
+
+\newcommand*{\annot}[1]{\ifdraft \textcolor{red}{#1} \fi}
+
+\setlength\parindent{0pt}
+
+\makeatletter
+\renewcommand\maketitle{\begin{titlepage}%
+		\begin{center}%
+			\null
+			\vskip -2 \baselineskip
+			\begin{minipage}[t][0.2\textheight][t]{\textwidth}
+				\begin{center}%
+					\null
+					\vfill
+					\LARGE
+					\textsc{\@title} \par
+					\Large
+					\textsc{\@subtitle}\par
+					\vspace{1.0cm}
+				\end{center}
+			\end{minipage}
+			\noindent\makebox[\linewidth]{\rule{\textwidth}{0.4pt}}\par
+			\large
+			\vskip 0.5 \baselineskip
+			\textsc{\@author}\par
+			\vspace*{1 cm}
+			\textsc{A thesis submitted to \@university  in partial fulfilment of the requirements for the degree of \@degree} \par
+			\vskip 1.75 \baselineskip
+%			\IfFileExists{\@logo}{\includegraphics[height=0.24\textheight]}{\@logo}{%
+%				\resizebox{\textwidth}{0.24\textheight}{
+%					\begin{picture}
+%					{\circle}
+%					\end{picture}
+%				}
+%			}
+			\vskip 5 \baselineskip
+			\vskip 0.75 \baselineskip
+			\textsc{\@school} \par
+			\textsc{\@university}\par
+			\textsc{\@submit} \par
+		\end{center}\par
+	\end{titlepage}%
+}
+\makeatother
+

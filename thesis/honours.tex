@@ -1,0 +1,154 @@
+\documentclass[12pt, a4paper, oneside]{report} 
+
+
+\usepackage{amsmath} % AMS Math Package
+\usepackage{amsthm} % Theorem Formatting
+\usepackage{amssymb}	% Math symbols such as \mathbb
+\usepackage{graphicx} % Allows for eps images
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[
+margin=1.25 in,
+includefoot,
+footskip=30pt,
+]{geometry}
+\usepackage{chemfig}
+\usepackage[sort&compress,numbers,super]{natbib}
+\usepackage[version=3]{mhchem}
+\usepackage[none]{hyphenat}
+\usepackage{honours}
+
+% This defines the "body" environment
+\newenvironment{preamble}
+{
+	\clearpage
+	\pagenumbering{roman}
+	\setcounter{page}{1}
+}
+
+\newenvironment{body}
+{
+	\clearpage
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+}
+
+
+\spacing{1.5} 
+\bibliographystyle{achemso}
+
+% This defines the "abbreviations" environment
+\newcommand{\abbrlabel}[1]{\makebox[3cm][l]{\textbf{#1}\ \dotfill}}
+\newenvironment{abbreviations}{\begin{list}{}{\renewcommand{\makelabel}{\abbrlabel}}}{\end{list}}
+
+\author{Paul D. Solomon}
+\title{Protein Folding in Higher Dimensions}
+\subtitle{Using higher dimensional space to improve speed of protein folding simulations}
+\university{The University of Sydney}
+\degree{Bachelor of Science (Advanced) (Honours) }
+\school{School of Chemistry}
+\submit{November 2017}
+
+
+\begin{document}
+
+\maketitle
+
+% The "preamble" environment used roman numbering
+\begin{preamble}
+	
+	\chapter*{Abstract}
+	
+	The first sentence of your abstract is critical, It is usually a brief 
+	informational statement of your the results reported in your thesis. In 
+	principle, the reader should have to go no further if the subject is of little 
+	interest to him or her. Your abstract does not include a restatement of your 
+	title. It should contain specific data. For example, a general statement that 
+	an important measurement was made is insufficient; include the actual results 
+	and their uncertainties.
+	\\\\
+	For a thesis you may like to write two or three paragraphs in your abstract. 
+	That is, you may wish to use a paragraph for each of the major results in your 
+	thesis.
+	\\\\
+	
+	\newpage
+	
+	\chapter*{Acknowledgements and Statement of Contribution}
+	You must acknowledge all assistance from staff and others on a separate 
+	page of the thesis, immediately after the title page and before any general 
+	acknowledgements, explaining their role briefly but precisely. You must give 
+	details of contributors to the project. For example, were you part of a team 
+	who performed the experiment, did someone write parts of the computer code, 
+	take the observations, build some of the apparatus, or do some of the analytic 
+	work? If any of your Honours research built on results previously obtained in 
+	another research project (for example a TSP project) these results must be 
+	clearly highlighted. Here you must also acknowledge any assistance that was 
+	provided in thesis preparation. You must provide a signed and dated statement 
+	of originality of the form: 
+	\\\\
+	\centerline{I certify that this report contains work carried out by myself}
+	\centerline{except where otherwise acknowledge}
+	\\\\\
+	Signed:\\
+	\rule[1em]{25em}{0.5pt} % This prints a line for the signature
+	
+	Date:\\
+	\rule[1em]{25em}{0.5pt} % This prints a line to write the date
+	\newpage
+	
+	\section*{Acknowledgements}
+	This is the general statement thanking people. It is the appropriate place to 
+	thank your supervisor, your family, your research group, your office mates, 
+	the rest of the honours cohort, the pizza place down the road...
+	\\\\
+	
+	\newpage
+	
+	% Here you make your table of contents
+	\tableofcontents
+	\newpage
+	
+	% Here you list your figures (or tables)
+	\listoffigures
+	\newpage
+	% you may also like to list abbreviations used as a list of abbreviations or 
+	%as a glossary
+	\chapter*{Abbreviations}
+	\begin{center}
+		
+		\begin{abbreviations}
+			\item[ESR] Electron Spin Resonance
+			\item[NMR] Nuclear Magnetic Resonance
+		\end{abbreviations}
+		
+	\end{center}
+\end{preamble}
+
+% Now begin the body of your thesis 
+% The "body" environment used arabic numbering
+% Here each chapter is a separate document and latex incorporates them all 
+% when it compiles the document
+%
+\begin{body}
+	\input{chapter1.tex}
+	\input{chapter2.tex}
+	\input{chapter3.tex}
+%	\input{Chapter4.tex}
+%	
+\end{body}
+
+\begin{preamble}
+	
+	% Now for bibliography and appendices (if applicable). Again these are using 
+	%roman numerals for the page numbers. 
+	\begin{spacing}{1.0}
+		
+		\bibliography{honours}
+		
+	\end{spacing}
+	%\input{Appendix.tex}
+\end{preamble}
+	
+\end{document}
