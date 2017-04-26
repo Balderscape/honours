@@ -1,0 +1,49 @@
+\chapter{Higher Dimensional Molecular Dynamics}
+
+\section{MD Simulation packages}
+
+Gromacs
+Amber
+NAMD
+Openmm
+
+\section{Forcefields}
+Choice of forcefield
+
+
+\section{Modifications}
+
+Modifications that need to be made to the MD software to allow for higher dimensional simulations.
+
+\subsection{Bonded forces}
+The Bonded forces are used to approximate the chemical bonds of a molecule. The basic set of forces includes a harmonic bond, dihedral angle and torsional forces. Improper dihedral forces are also included to ensure that chirality is maintained in a molecule. 
+
+The harmonic bond force provides a restoring force between two atoms to maintains a preferred distance.
+\begin{equation}\label{md:1:harmonic_bond}
+V_{HB} = \sum^{bonds}\frac{1}{2} K_b (r - r_0)^2
+\end{equation}
+\begin{equation}\label{md:2:harmonic_angle}
+V_{\theta} = \sum^{angles}\frac{1}{2} K_{\theta} (\theta - \theta_0)^2
+\end{equation}
+
+
+ 
+\begin{enumerate}
+\item Harmonic Bond
+\item Harmonic Angle
+\item Periodic Angle
+\item Improper Dihedral Angle (Chirality)
+\item LJ force
+\item Coulomb force
+\item PME approximations
+\item Integration
+\item Boundary Conditions
+\item Ensembles
+\item Thermostats
+\item Barostats
+\item Solvation
+\item REMD / changes in dimensionality
+\end{enumerate}
+
+
+\newpage
