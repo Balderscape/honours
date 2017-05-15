@@ -4,6 +4,7 @@
 
 Gromacs
 Amber
+CHARMM
 NAMD
 Openmm
 
@@ -16,6 +17,8 @@ Choice of forcefield
 Modifications that need to be made to the MD software to allow for higher dimensional simulations.
 
 \subsection{Bonded forces}
+The AMBER99 forcefield defines 4 bonded forces and also 2 non-bonded forces. The bonded forces consist of a harmonic bond force and harmonic angle force followed by two periodic torsional forces both proper and improper. The non-bonded forces are a Lennard-Jones force and a Coulomb force. 
+
 The Bonded forces are used to approximate the chemical bonds of a molecule. The basic set of forces includes a harmonic bond, dihedral angle and torsional forces. Improper dihedral forces are also included to ensure that chirality is maintained in a molecule. 
 
 The harmonic bond force provides a restoring force between two atoms to maintains a preferred distance.
